@@ -33,6 +33,43 @@ class QuestionAdmin(admin.ModelAdmin):
     inlines = [ChoiceInline]
 
 # Question and Choice models
+class Question(models.Model):
+    # Foreign key to lesson
+    # question text
+    # question grade/mark
+    lessor=models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    text = models.CharField(max_length=150)
+    grade = models.FloatField()
+    # A sample model method to calculate if learner get the score of the question
+    def is_get_score(self, selected_ids):
+        all_answers = self.choice_set.filter(is_correct=True).count()
+        selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
+        if all_answers == selected_correct:
+            return True
+        else:
+            return False
+    
+
+    # Model method to calculate if learner get the score of the question
+    def is_get_score(self, selected_ids):
+        all_answers = self.choice_set.filter(is_correct=True).count()
+        selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
+        if all_answers == selected_correct:
+            return True
+        else:
+            return False
+
+
+#  Choice Model:
+
+class Choice(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    text = models.CharField(max_length=250, default="question text")
+    is_correct = models.BooleanField(default=False)
+    def __str__(self):
+        return self.content + (' :is correct' if self.is_correct else ' :not correct')
+
+
 
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Lesson, LessonAdmin)
